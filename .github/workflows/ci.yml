@@ -148,6 +148,7 @@ jobs:
       run: |
         wget ${{ env.ONNX_TARFILE_URL }} -P ${{ env.ONNX_PATH }}
         tar xzvf ${{ env.ONNX_PATH }}/${{ env.ONNX_TARFILE }} --strip-components=1 -C ${{ env.BACKENDS_INSTALL_PATH }}
+        ls -R ${{ env.BACKENDS_INSTALL_PATH }}
         echo "ONNX Lib downloaded and installed"
 
     - name: Download and install TF-CAPI Runtime Lib
@@ -161,6 +162,7 @@ jobs:
       run: |
         wget ${{ env.TFC_TARFILE_URL }} -P ${{ env.TFC_PATH }}
         tar xzvf ${{ env.TFC_PATH }}/${{ env.TFC_TARFILE }} --strip-components=1 -C ${{ env.BACKENDS_INSTALL_PATH }}
+        ls -R ${{ env.BACKENDS_INSTALL_PATH }}
         echo "TFC Lib downloaded and installed"
 
 #    - name: Checkout TensorFlow Repository
