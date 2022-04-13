@@ -17,7 +17,7 @@ ecbuild_add_test(TARGET        infero_test_inference_model
 )
 
 # regression tests
-add_subdirectory(regressions)
+#add_subdirectory(regressions)
 
 # copy test data to build directory
 add_custom_command(TARGET infero_test_inference_model POST_BUILD
@@ -30,7 +30,7 @@ add_custom_command(TARGET infero_test_inference_model POST_BUILD
 add_subdirectory(c_api)
 
 
-# f-api
-if(HAVE_FCKIT)
-    add_subdirectory(f_api)
-endif()
+## f-api
+#if(HAVE_FCKIT)
+#    add_subdirectory(f_api)
+#endif()
