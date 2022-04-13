@@ -202,10 +202,10 @@ jobs:
         gnu-10@macos-10.15
         clang-12@macos-10.15
       codecov_upload: false
-      notify_teams: false
+      notify_teams: true
       deps_cache_key: ${{ needs.deps.outputs.deps-cache-key }}
       build_package_inputs: |
-        cmake_options: -DENABLE_MPI=OFF -DENABLE_FCKIT=ON -DFCKIT_ROOT=${INSTALL_PATH} -DENABLE_TF_C=OFF -DTENSORFLOWC_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_ONNX=OFF -DONNX_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_TF_LITE=OFF -DTENSORFLOWLITE_ROOT=$TFLITE_PATH -DENABLE_TENSORRT=OFF
+        cmake_options: -DENABLE_MPI=OFF -DENABLE_FCKIT=ON -DFCKIT_ROOT=${INSTALL_PATH} -DENABLE_TF_C=OFF -DTENSORFLOWC_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_ONNX=ON -DONNX_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_TF_LITE=OFF -DTENSORFLOWLITE_ROOT=$TFLITE_PATH -DENABLE_TENSORRT=OFF
         dependencies: |
           ecmwf/ecbuild
           ecmwf/eckit@refs/tags/1.19.0
