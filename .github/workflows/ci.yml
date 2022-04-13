@@ -25,9 +25,9 @@ jobs:
       matrix:
         name:
         - gnu-10@ubuntu-20.04
-#        - clang-12@ubuntu-20.04
-#        - gnu-10@ubuntu-18.04
-#        - clang-9@ubuntu-18.04
+        - clang-12@ubuntu-20.04
+        - gnu-10@ubuntu-18.04
+        - clang-9@ubuntu-18.04
         # Currently disabled due to ONNX Runtime build issue (flatbuffers dependency):
         #   - g++-10: error: unrecognized command-line option '-stdlib=libc++'
         # - gnu-10@macos-10.15
@@ -41,41 +41,41 @@ jobs:
           compiler_cc: gcc-10
           compiler_cxx: g++-10
           compiler_fc: gfortran-10
-#        - name: clang-12@ubuntu-20.04
-#          os: ubuntu-20.04
-#          compiler: clang-12
-#          compiler_cc: clang-12
-#          compiler_cxx: clang++-12
-#          compiler_fc: gfortran-10
-#        - name: gnu-10@ubuntu-18.04
-#          os: ubuntu-18.04
-#          compiler: gnu-10
-#          compiler_cc: gcc-10
-#          compiler_cxx: g++-10
-#          compiler_fc: gfortran-10
-#        - name: clang-9@ubuntu-18.04
-#          os: ubuntu-18.04
-#          compiler: clang-9
-#          compiler_cc: clang-9
-#          compiler_cxx: clang++-9
-#          compiler_fc: gfortran-9
-#        # Currently disabled due to ONNX Runtime build issue (flatbuffers dependency):
-#        #   - g++-10: error: unrecognized command-line option '-stdlib=libc++'
-#        # - name: gnu-10@macos-10.15
-#        #   os: macos-10.15
-#        #   compiler: gnu-10
-#        #   compiler_cc: gcc-10
-#        #   compiler_cxx: g++-10
-#        #   compiler_fc: gfortran-10
-#        # Currently disabled due to infero build issue:
-#        #  - Undefined symbols for architecture x86_64: "eckit::mpi::comm(char const*)"
-#        # # Xcode compiler requires empty environment variables, so we pass null (~) here
-#        # - name: clang-12@macos-10.15
-#        #   os: macos-10.15
-#        #   compiler: clang-12
-#        #   compiler_cc: ~
-#        #   compiler_cxx: ~
-#        #   compiler_fc: gfortran-10
+        - name: clang-12@ubuntu-20.04
+          os: ubuntu-20.04
+          compiler: clang-12
+          compiler_cc: clang-12
+          compiler_cxx: clang++-12
+          compiler_fc: gfortran-10
+        - name: gnu-10@ubuntu-18.04
+          os: ubuntu-18.04
+          compiler: gnu-10
+          compiler_cc: gcc-10
+          compiler_cxx: g++-10
+          compiler_fc: gfortran-10
+        - name: clang-9@ubuntu-18.04
+          os: ubuntu-18.04
+          compiler: clang-9
+          compiler_cc: clang-9
+          compiler_cxx: clang++-9
+          compiler_fc: gfortran-9
+        # Currently disabled due to ONNX Runtime build issue (flatbuffers dependency):
+        #   - g++-10: error: unrecognized command-line option '-stdlib=libc++'
+        # - name: gnu-10@macos-10.15
+        #   os: macos-10.15
+        #   compiler: gnu-10
+        #   compiler_cc: gcc-10
+        #   compiler_cxx: g++-10
+        #   compiler_fc: gfortran-10
+        # Currently disabled due to infero build issue:
+        #  - Undefined symbols for architecture x86_64: "eckit::mpi::comm(char const*)"
+        # # Xcode compiler requires empty environment variables, so we pass null (~) here
+        # - name: clang-12@macos-10.15
+        #   os: macos-10.15
+        #   compiler: clang-12
+        #   compiler_cc: ~
+        #   compiler_cxx: ~
+        #   compiler_fc: gfortran-10
     runs-on: ${{ matrix.os }}
     env:
 
@@ -101,18 +101,20 @@ jobs:
       run: |
         DEPS_PATH="${{ runner.temp }}/deps"
         INSTALL_PATH="${{ runner.temp }}/install"
+        BACKENDS_INSTALL_PATH="${{ runner.temp }}/install"
 
         ONNX_PATH="${DEPS_PATH}/onnxruntime"
         TFC_PATH="${DEPS_PATH}/tensorflow_c_api"
         TFLITE_PATH="${DEPS_PATH}/tflite"
 
-        DEPS_ENV="DEPS_PATH=${DEPS_PATH}"$'\n'"INSTALL_PATH=${INSTALL_PATH}"
+        DEPS_ENV="DEPS_PATH=${DEPS_PATH}"$'\n'"INSTALL_PATH=${INSTALL_PATH}"$'\n'"BACKENDS_INSTALL_PATH=${BACKENDS_INSTALL_PATH}"
         DEPS_ENV_ONNX="ONNX_PATH=${ONNX_PATH}"$'\n'"ONNX_TARFILE=${ONNX_TARFILE}"
         DEPS_ENV_TFC="TFC_PATH=${TFC_PATH}"$'\n'"TFC_TARFILE=${TFC_TARFILE}"
         DEPS_ENV_TFLITE="TFLITE_PATH=${TFLITE_PATH}"$'\n'"TFLITE_VERSION=${TFLITE_VERSION}"
 
         mkdir -p ${DEPS_PATH}
         mkdir -p ${INSTALL_PATH}
+        mkdir -p ${BACKENDS_INSTALL_PATH}
 
         echo "${DEPS_ENV}" > ${DEPS_PATH}/.env
         echo "${DEPS_ENV_ONNX}" >> ${DEPS_PATH}/.env
@@ -145,7 +147,7 @@ jobs:
       shell: bash -eux {0}
       run: |
         wget ${{ env.ONNX_TARFILE_URL }} -P ${{ env.ONNX_PATH }}
-        tar xzvf ${{ env.ONNX_PATH }}/${{ env.ONNX_TARFILE }} --strip-components=1 -C ${{ env.INSTALL_PATH }}
+        tar xzvf ${{ env.ONNX_PATH }}/${{ env.ONNX_TARFILE }} --strip-components=1 -C ${{ env.BACKENDS_INSTALL_PATH }}
         echo "ONNX Lib downloaded and installed"
 
     - name: Download and install TF-CAPI Runtime Lib
@@ -158,7 +160,7 @@ jobs:
       shell: bash -eux {0}
       run: |
         wget ${{ env.TFC_TARFILE_URL }} -P ${{ env.TFC_PATH }}
-        tar xzvf ${{ env.TFC_PATH }}/${{ env.TFC_TARFILE }} --strip-components=1 -C ${{ env.INSTALL_PATH }}
+        tar xzvf ${{ env.TFC_PATH }}/${{ env.TFC_TARFILE }} --strip-components=1 -C ${{ env.BACKENDS_INSTALL_PATH }}
         echo "TFC Lib downloaded and installed"
 
 #    - name: Checkout TensorFlow Repository
@@ -196,14 +198,14 @@ jobs:
     needs:
     - deps
     with:
-#      skip_matrix_jobs: |
-#        gnu-10@macos-10.15
-#        clang-12@macos-10.15
-#      codecov_upload: true
+      skip_matrix_jobs: |
+        gnu-10@macos-10.15
+        clang-12@macos-10.15
+      codecov_upload: false
       notify_teams: false
       deps_cache_key: ${{ needs.deps.outputs.deps-cache-key }}
       build_package_inputs: |
-        cmake_options: -DENABLE_MPI=OFF -DENABLE_FCKIT=ON -DFCKIT_ROOT=${INSTALL_PATH} -DENABLE_TF_C=ON -DTENSORFLOWC_ROOT=${INSTALL_PATH} -DENABLE_ONNX=ON -DONNX_ROOT=${INSTALL_PATH} -DENABLE_TF_LITE=OFF -DTENSORFLOWLITE_ROOT=$TFLITE_PATH -DENABLE_TENSORRT=OFF
+        cmake_options: -DENABLE_MPI=OFF -DENABLE_FCKIT=ON -DFCKIT_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_TF_C=ON -DTENSORFLOWC_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_ONNX=ON -DONNX_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_TF_LITE=OFF -DTENSORFLOWLITE_ROOT=$TFLITE_PATH -DENABLE_TENSORRT=OFF
         dependencies: |
           ecmwf/ecbuild
           ecmwf/eckit@refs/tags/1.19.0
