@@ -103,10 +103,10 @@ jobs:
         INSTALL_PATH="${{ runner.temp }}/install"        
 
         ONNX_PATH="${DEPS_PATH}/onnxruntime"
-        ONNX_INSTALL_PATH="${{ runner.temp }}/install_onnx"
+        ONNX_INSTALL_PATH="${DEPS_PATH}/install_onnx"
         
         TFC_PATH="${DEPS_PATH}/tensorflow_c_api"
-        TFC_INSTALL_PATH="${{ runner.temp }}/install_tfc"
+        TFC_INSTALL_PATH="${DEPS_PATH}/install_tfc"
         
         TENSORFLOW_PATH="$DEPS_PATH/tensorflow"
         TFLITE_PATH="${DEPS_PATH}/tensorflow/tensorflow/lite/build"
@@ -133,7 +133,7 @@ jobs:
         echo "${DEPS_ENV_TFC}" >> ${GITHUB_ENV}
         echo "${DEPS_ENV_TFLITE}" >> ${GITHUB_ENV}
 
-        echo ::set-output name=deps-cache-key::"deps-onnxruntime-${{ env.ONNX_VERSION }}-tfc-${{ env.TFC_VERSION }}-tflite-${{ env.TFLITE_VERSION }}-cache_v7-"
+        echo ::set-output name=deps-cache-key::"deps-onnxruntime-${{ env.ONNX_VERSION }}-tfc-${{ env.TFC_VERSION }}-tflite-${{ env.TFLITE_VERSION }}-cache_v8-"
 
     - name: Check for Dependency Cache
       id: deps-cache
