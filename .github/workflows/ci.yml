@@ -129,7 +129,7 @@ jobs:
         echo "${DEPS_ENV_TFC}" >> ${GITHUB_ENV}
         echo "${DEPS_ENV_TFLITE}" >> ${GITHUB_ENV}
 
-        echo ::set-output name=deps-cache-key::"deps-onnxruntime-${{ env.ONNX_VERSION }}-tfc-${{ env.TFC_VERSION }}-tflite-${{ env.TFLITE_VERSION }}-cache_v5-"
+        echo ::set-output name=deps-cache-key::"deps-onnxruntime-${{ env.ONNX_VERSION }}-tfc-${{ env.TFC_VERSION }}-tflite-${{ env.TFLITE_VERSION }}-cache_v6-"
 
     - name: Check for Dependency Cache
       id: deps-cache
