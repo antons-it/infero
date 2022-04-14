@@ -147,6 +147,7 @@ jobs:
       working-directory: ${{ env.DEPS_PATH }}
       shell: bash -eux {0}
       run: |
+        mkdir -p ${{ env.ONNX_PATH }}
         wget ${{ env.ONNX_TARFILE_URL }} -P ${{ env.ONNX_PATH }}
         tar xzvf ${{ env.ONNX_PATH }}/${{ env.ONNX_TARFILE }} --strip-components=1 -C ${{ env.BACKENDS_INSTALL_PATH }}
         ls -R ${{ env.BACKENDS_INSTALL_PATH }}
@@ -161,6 +162,7 @@ jobs:
       working-directory: ${{ env.DEPS_PATH }}
       shell: bash -eux {0}
       run: |
+        mkdir -p ${{ env.TFC_PATH }}
         wget ${{ env.TFC_TARFILE_URL }} -P ${{ env.TFC_PATH }}
         tar xzvf ${{ env.TFC_PATH }}/${{ env.TFC_TARFILE }} --strip-components=1 -C ${{ env.BACKENDS_INSTALL_PATH }}
         ls -R ${{ env.BACKENDS_INSTALL_PATH }}
