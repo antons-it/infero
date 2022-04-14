@@ -89,7 +89,7 @@ jobs:
       TFC_TARFILE: libtensorflow-cpu-linux-x86_64-${TFC_VERSION}.tar.gz
       TFC_TARFILE_URL: ${TFC_URL}/libtensorflow-cpu-linux-x86_64-${TFC_VERSION}.tar.gz
 
-      TFLITE_VERSION: 2.6.0
+      TFLITE_VERSION: 2.9.0
 
     outputs:
       deps-cache-key: ${{ steps.setup-environment.outputs.deps-cache-key }}
