@@ -128,7 +128,7 @@ jobs:
         echo "${DEPS_ENV_TFC}" >> ${GITHUB_ENV}
         echo "${DEPS_ENV_TFLITE}" >> ${GITHUB_ENV}
 
-        echo ::set-output name=deps-cache-key::"deps-onnxruntime-${{ env.ONNX_VERSION }}-tfc-${{ env.TFC_VERSION }}-tflite-${{ env.TFLITE_VERSION }}-cache_v2"
+        echo ::set-output name=deps-cache-key::"deps-onnxruntime-${{ env.ONNX_VERSION }}-tfc-${{ env.TFC_VERSION }}-tflite-${{ env.TFLITE_VERSION }}-cache_v3-"
 
     - name: Check for Dependency Cache
       id: deps-cache
@@ -165,31 +165,31 @@ jobs:
         ls -R ${{ env.BACKENDS_INSTALL_PATH }}
         echo "TFC Lib downloaded and installed"
 
-#    - name: Checkout TensorFlow Repository
-#      if: steps.deps-cache.outputs.cache-hit != 'true'
-#      uses: actions/checkout@v2
-#      with:
-#        repository: tensorflow/tensorflow
-#        ref: ${{ env.TFLITE_VERSION }}
-#        path: ${{ github.workspace }}/tensorflow
-#
-#    - name: Build TensorFlow Lite
-#      if: steps.deps-cache.outputs.cache-hit != 'true'
-#      env:
-#        CC: ${{ matrix.compiler_cc }}
-#        CXX: ${{ matrix.compiler_cxx }}
-#        FC: ${{ matrix.compiler_fc }}
-#      working-directory: ${{ github.workspace }}/tensorflow
-#      shell: bash -eux {0}
-#      run: |
-#        mkdir -p ${{ env.TFLITE_PATH }}
-#        mv tensorflow third_party ${{ env.TFLITE_PATH }}
-#        cd ${{ env.TFLITE_PATH }}/tensorflow/lite
-#        SRC_DIR=$(pwd)
-#        BUILD_DIR=build
-#        rm -rf ${BUILD_DIR} && mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-#        cmake -DCMAKE_PREFIX_PATH=${{ env.TFLITE_PATH }} -DBUILD_SHARED_LIBS=ON ${SRC_DIR}
-#        cmake --build . -j2
+    - name: Checkout TensorFlow Repository
+      if: steps.deps-cache.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        repository: tensorflow/tensorflow
+        ref: ${{ env.TFLITE_VERSION }}
+        path: ${{ github.workspace }}/tensorflow
+
+    - name: Build TensorFlow Lite
+      if: steps.deps-cache.outputs.cache-hit != 'true'
+      env:
+        CC: ${{ matrix.compiler_cc }}
+        CXX: ${{ matrix.compiler_cxx }}
+        FC: ${{ matrix.compiler_fc }}
+      working-directory: ${{ github.workspace }}/tensorflow
+      shell: bash -eux {0}
+      run: |
+        mkdir -p ${{ env.TFLITE_PATH }}
+        mv tensorflow third_party ${{ env.TFLITE_PATH }}
+        cd ${{ env.TFLITE_PATH }}/tensorflow/lite
+        SRC_DIR=$(pwd)
+        BUILD_DIR=build
+        rm -rf ${BUILD_DIR} && mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+        cmake -DCMAKE_PREFIX_PATH=${{ env.TFLITE_PATH }} -DBUILD_SHARED_LIBS=ON ${SRC_DIR}
+        cmake --build . -j2
 
   # Calls a reusable CI workflow to build & test the current repository.
   #   It will pull in all needed dependencies and produce a code coverage report on success.
@@ -207,7 +207,7 @@ jobs:
       notify_teams: true
       deps_cache_key: ${{ needs.deps.outputs.deps-cache-key }}
       build_package_inputs: |
-        cmake_options: -DENABLE_MPI=OFF -DENABLE_FCKIT=ON -DFCKIT_ROOT=${INSTALL_PATH} -DENABLE_TF_C=OFF -DTENSORFLOWC_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_ONNX=ON -DONNX_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_TF_LITE=OFF -DTENSORFLOWLITE_ROOT=$TFLITE_PATH -DENABLE_TENSORRT=OFF
+        cmake_options: -DENABLE_MPI=OFF -DENABLE_FCKIT=ON -DFCKIT_ROOT=${INSTALL_PATH} -DENABLE_TF_C=OFF -DTENSORFLOWC_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_ONNX=OFF -DONNX_ROOT=${BACKENDS_INSTALL_PATH} -DENABLE_TF_LITE=OFF -DTENSORFLOWLITE_ROOT=$TFLITE_PATH -DENABLE_TENSORRT=OFF
         dependencies: |
           ecmwf/ecbuild
           ecmwf/eckit@refs/tags/1.19.0
