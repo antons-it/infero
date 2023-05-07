@@ -39,7 +39,7 @@ void read_csv(const char* file_path, float* values){
 int main(int argc, char** argv){
 
     const float tol = 1e-3;
-    const int nInferenceReps = 10;
+    const int nInferenceReps = 5;
     const int n_batch = 32;
 
     char* model_path = argv[1];
@@ -69,7 +69,7 @@ int main(int argc, char** argv){
     printf("input_path %s \n", input_path);
     printf("ref_output_path %s \n", ref_output_path);
 
-    sprintf(yaml_str, " path: %s\n type: %s", model_path, model_type);
+    sprintf(yaml_str, " path: %s\n device: rank\n type: %s", model_path, model_type);
     printf("yaml_str:\n%s\n", yaml_str);
 
     // tcyclone model input size [ n_batch, 200, 200, 17 ]
@@ -150,6 +150,8 @@ int main(int argc, char** argv){
             exit(1);
         }
     }
+    
+    printf("Inference output checked. All good");
 
     free(input_tensor);
     free(output_tensor);

@@ -14,6 +14,9 @@
 #include <vector>
 
 #include "eckit/log/Log.h"
+#ifdef HAVE_MPI
+#include "eckit/mpi/Comm.h"
+#endif
 
 #include "infero/models/InferenceModelTFC.h"
 #include "infero/infero_utils.h"
@@ -33,10 +36,9 @@ void NoOpDeallocator(void* data, size_t a, void* b) {
 
 ModelParams_t InferenceModelTFC::implDefaultParams_(){
     ModelParams_t params_;
-       
     params_["numInteropThreads"] = "1";
     params_["numIntraopThreads"] = "1";
-
+    params_["device"] = "rank";
     return params_;
 }
 
@@ -55,13 +57,15 @@ InferenceModelTFC::InferenceModelTFC(const eckit::Configuration& conf) :
     network_graph = TF_NewGraph();
     err_status = TF_NewStatus();
 
-    // options
-    session_options = TF_NewSessionOptions();
+    // configure session options
+    configureSessionOptions();
 
-    uint8_t numInteropThreads_ = ModelConfig_->getInt("numInteropThreads");
-    uint8_t numIntraopThreads_ = ModelConfig_->getInt("numIntraopThreads");
-    uint8_t buf[]={0x10,numInteropThreads_,0x28,numIntraopThreads_};
-    TF_SetConfig(session_options, buf,sizeof(buf), err_status);    
+    // options
+//    session_options = TF_NewSessionOptions();
+//    uint8_t numInteropThreads_ = ModelConfig_->getInt("numInteropThreads");
+//    uint8_t numIntraopThreads_ = ModelConfig_->getInt("numIntraopThreads");
+//    uint8_t buf[]={0x10,numInteropThreads_,0x28,numIntraopThreads_};
+//    TF_SetConfig(session_options, buf,sizeof(buf), err_status);    
 
     run_options = nullptr;
 
@@ -452,5 +456,40 @@ void InferenceModelTFC::broadcast_model(const std::string path){
   // whole directory rather than a single file
 
 }
+
+void InferenceModelTFC::configureSessionOptions() {
+
+    // options
+    session_options = TF_NewSessionOptions();
+
+//    uint8_t numInteropThreads_ = config().getInt("numInteropThreads");
+//    uint8_t numIntraopThreads_ = config().getInt("numIntraopThreads");
+    uint8_t numInteropThreads_ = ModelConfig_->getInt("numInteropThreads");
+    uint8_t numIntraopThreads_ = ModelConfig_->getInt("numIntraopThreads");
+
+    int deviceID = 0;
+    if (ModelConfig_->getString("device") == "rank") {
+#ifdef HAVE_MPI
+        deviceID = eckit::mpi::comm().rank();
+#endif
+    } else {
+        try {
+            deviceID = std::stoi(ModelConfig_->getString("device"));
+        } catch(std::invalid_argument const& ex) {
+            eckit::Log::info() << "Model configuration <device> not valid. "
+                            << "It must be either an integer in [0..9] or \"rank\". "
+                            << "Found instead:" << ModelConfig_->getString("device") 
+                            << " => defaulting to deviceID=0" << std::endl;
+            eckit::Log::info() << ex.what() << std::endl;
+            deviceID = 0;
+        }
+    }
+        // NB: assume one digit only in [0,1,2,3,4,5,6,7,8,9]
+        uint8_t device_ = deviceID + 48; // 48 ASCII decimal code for char "0"
+        uint8_t buf[]={0x10,numInteropThreads_,0x28,numIntraopThreads_,0x32,0x3,0x2a,0x1,device_};
+        TF_SetConfig(session_options, buf, sizeof(buf), err_status);    
+
+    }
+
 
 }  // namespace infero

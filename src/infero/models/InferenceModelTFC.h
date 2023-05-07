@@ -59,6 +59,9 @@ private:
     /// + contains specialised logic for output layer
     TF_Output GetOutputOperationBuffer_(std::string name);
 
+    // configure session options from model configuration
+    void configureSessionOptions();
+
 private:
 
     TF_Session* session;
